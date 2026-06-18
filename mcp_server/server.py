@@ -67,5 +67,19 @@ def knowledge_base(
     )
 
 
+@mcp.tool()
+def policy_lookup(
+    query: str,
+):
+    """
+    Search policy documents.
+    """
+
+    return execute_tool(
+        "policy_lookup",
+        query,
+    )
+
+
 if __name__ == "__main__":
     mcp.run()
