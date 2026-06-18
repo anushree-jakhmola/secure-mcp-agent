@@ -1,0 +1,11 @@
+MCP Security Policy
+
+All MCP tools must be registered through the approved tool registry.
+
+Direct tool execution is prohibited.
+
+Every MCP tool invocation must pass through the Secure Tool Executor.
+
+Unauthorized tool requests shall be denied and logged.
+
+Tool discovery and execution events shall be auditable.

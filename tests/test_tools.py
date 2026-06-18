@@ -1,16 +1,6 @@
-from guardrails.output_guardrails import (
-    secure_output_pipeline,
-)
+from mcp_server.registry import TOOL_REGISTRY
 
-sample_output = """
-User email: john.doe@gmail.com
-Phone: 9876543210
-PAN: ABCDE1234F
-AADHAAR: 1234 5678 9012
-"""
+print("Registered Tools:")
 
-result = secure_output_pipeline(
-    sample_output
-)
-
-print(result)
+for tool in TOOL_REGISTRY:
+    print(tool)

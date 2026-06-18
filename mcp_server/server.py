@@ -14,7 +14,7 @@ from guardrails.audit_logger import log_event
 mcp = FastMCP("Secure MCP Agent")
 
 
-def execute_tool(tool_name: str):
+def execute_tool(tool_name: str, *args, **kwargs):
     """
     Centralized secure execution.
     """
@@ -31,12 +31,16 @@ def execute_tool(tool_name: str):
             f"Tool '{tool_name}' not found."
         )
 
-    return tool()
+    result = tool(
+        *args,
+        **kwargs
+    )
 
     log_event(
         "TOOL_EXECUTED",
         tool_name,
     )
+
     return result
 
 
@@ -47,6 +51,20 @@ def system_info():
     """
 
     return execute_tool("system_info")
+
+
+@mcp.tool()
+def knowledge_base(
+    query: str
+):
+    """
+    Search security knowledge base.
+    """
+
+    return execute_tool(
+        "knowledge_base",
+        query
+    )
 
 
 if __name__ == "__main__":

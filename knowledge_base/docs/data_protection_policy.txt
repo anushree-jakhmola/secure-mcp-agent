@@ -1,0 +1,15 @@
+Data Protection Policy
+
+Personally identifiable information shall not be exposed in system outputs.
+
+The system must detect and redact:
+
+Email addresses
+
+Phone numbers
+
+PAN identifiers
+
+Aadhaar identifiers
+
+PII detection shall occur during both input and output processing.

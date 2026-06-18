@@ -1,0 +1,13 @@
+AI Safety Policy
+
+The Secure MCP Agent shall operate under the principle of least privilege.
+
+The agent must only access approved tools and resources.
+
+All tool invocations must pass authorization checks.
+
+Prompt injection attempts must be detected and blocked.
+
+All security-relevant events must be logged for auditing purposes.
+
+Sensitive information must be redacted before being returned to users.

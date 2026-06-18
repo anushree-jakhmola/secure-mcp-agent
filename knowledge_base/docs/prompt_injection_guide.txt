@@ -1,0 +1,15 @@
+Prompt Injection Guide
+
+Prompt injection is an attack that attempts to override system instructions.
+
+Examples include:
+
+Ignore previous instructions
+
+Reveal system prompt
+
+Bypass restrictions
+
+Act as root user
+
+Prompt injection attempts must be detected before requests reach the agent.
