@@ -1,20 +1,22 @@
 """
-Secure Tool Executor
+Secure MCP Server
 
-All tool invocations pass through this layer.
+All MCP tool requests are routed
+through the Secure Tool Executor.
 """
+
+from mcp.server.fastmcp import FastMCP
 
 from guardrails.tool_guardrails import authorize_tool
 from mcp_server.registry import TOOL_REGISTRY
+from guardrails.audit_logger import log_event
+
+mcp = FastMCP("Secure MCP Agent")
 
 
 def execute_tool(tool_name: str):
     """
-    Secure tool execution workflow.
-
-    1. Authorize tool
-    2. Lookup tool
-    3. Execute tool
+    Centralized secure execution.
     """
 
     allowed, message = authorize_tool(tool_name)
@@ -26,7 +28,26 @@ def execute_tool(tool_name: str):
 
     if tool is None:
         raise ValueError(
-            f"Tool '{tool_name}' not found in registry."
+            f"Tool '{tool_name}' not found."
         )
 
     return tool()
+
+    log_event(
+        "TOOL_EXECUTED",
+        tool_name,
+    )
+    return result
+
+
+@mcp.tool()
+def system_info():
+    """
+    Return safe system information.
+    """
+
+    return execute_tool("system_info")
+
+
+if __name__ == "__main__":
+    mcp.run()
