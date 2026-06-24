@@ -29,3 +29,6 @@ knowledge_base/vectorstore/
 # Coverage
 .coverage
 htmlcov/
+
+# Audit Logs
+audit.log
