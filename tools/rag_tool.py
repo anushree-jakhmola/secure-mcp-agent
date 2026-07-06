@@ -40,7 +40,8 @@ def search_knowledge_base(
     top_k: int = 1,
 ):
     query_embedding = model.encode(
-        [query]
+        [query],
+        show_progress_bar=False,
     )
 
     query_embedding = np.array(

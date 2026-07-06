@@ -1,3 +1,12 @@
+import os
+import logging
+
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
 from guardrails.input_guardrails import secure_input_pipeline
 from tools.policy_tool import lookup_policy
 from tools.file_tool import read_allowed_file
@@ -63,9 +72,11 @@ print(policy_query)
 
 policy_result = lookup_policy(policy_query)
 
-print("\nRetrieved Policy:")
-print(policy_result)
+print("\nRetrieved Document:")
+print(policy_result[0]["document"])
 
+print("\nPolicy Content:")
+print(policy_result[0]["content"])
 
 separator()
 print("POLICY LOOKUP DEMONSTRATION COMPLETE")
