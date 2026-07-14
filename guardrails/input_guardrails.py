@@ -1,54 +1,65 @@
 """
 Input Guardrails
 
-1. Prompt Injection Detection
-2. PII Redaction
+Responsibilities:
+1. Normalize user input
+2. Detect prompt injection
+3. Redact PII
 """
 
+from guardrails.audit_logger import log_event
+from guardrails.input_normalizer import normalize_input
 from guardrails.pii_guardrail import redact_pii
 from guardrails.security_policy import BLOCKED_PATTERNS
-from guardrails.audit_logger import log_event
 
-def check_prompt_injection(user_input: str) -> tuple[bool, str]:
-    """
-    Detect blocked patterns.
-    """
 
-    normalized_input = user_input.lower()
+def check_prompt_injection(normalized_input: str) -> tuple[bool, str]:
+    """
+    Check normalized input against blocked security patterns.
+    """
 
     for pattern in BLOCKED_PATTERNS:
+
         if pattern in normalized_input:
+
             log_event(
-                "PROMPT_INJECTION_BLOCKED",
-                user_input,
-            )
-            return (
-                False,
-                f"Blocked by security policy: '{pattern}' detected."
+                event_type="PROMPT_INJECTION_BLOCKED",
+                details=f"Matched pattern: {pattern}",
+                guardrail="INPUT_GUARDRAIL",
+                severity="HIGH",
             )
 
-    return True, "Input passed validation."
+            return (
+                False,
+                f"Blocked by security policy. Matched pattern: '{pattern}'.",
+            )
+
+    return True, "Input passed security validation."
 
 
 def secure_input_pipeline(
     user_input: str,
 ) -> tuple[bool, str]:
     """
-    Multi-layer input security.
-
-    Returns:
-        (allowed, processed_input)
+    Complete input security pipeline.
     """
 
-    allowed, message = check_prompt_injection(
+    # Step 1
+    normalized_input = normalize_input(
         user_input
+    )
+
+    # Step 2
+    allowed, message = check_prompt_injection(
+        normalized_input
     )
 
     if not allowed:
         return False, message
 
+    # Step 3
     sanitized_input = redact_pii(
-        user_input
+        normalized_input
     )
 
     return True, sanitized_input

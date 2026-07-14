@@ -1,222 +1,388 @@
 # Secure MCP Agent
 
-A security-focused AI agent framework built using LangChain, FastMCP, Ollama, FAISS, and multiple guardrail layers.
+A security-focused AI agent framework that demonstrates how **Model Context Protocol (MCP)** based AI systems can be protected using layered security guardrails.
 
-The project demonstrates secure tool execution, prompt injection defense, retrieval-augmented generation (RAG), audit logging, and secure MCP tool integration.
-
----
-
-## Features
-
-### Security
-
-* Prompt Injection Detection
-* PII Detection and Redaction
-* Tool Authorization
-* Secure Tool Execution
-* Audit Logging
-* Restricted File Access
-
-### MCP
-
-* FastMCP Integration
-* Tool Discovery
-* Tool Registration
-* Secure Tool Invocation
-
-### Retrieval-Augmented Generation (RAG)
-
-* Sentence Transformers
-* FAISS Vector Search
-* Security Knowledge Base
-* Policy Retrieval
-
-### Agent Framework
-
-* LangChain Integration
-* Ollama Integration
-* Llama 3.2 Support
-* Secure Agent Orchestration
+The project integrates **LangChain**, **Ollama**, **FastMCP**, **FAISS**, and multiple security mechanisms to defend against prompt injection, protect sensitive information, authorize tool execution, secure file access, and provide Retrieval-Augmented Generation (RAG) using a trusted knowledge base.
 
 ---
 
-## Architecture
+# Project Overview
 
-User Query
-↓
-Input Guardrails
-↓
-Secure Agent (LangChain + Ollama)
-↓
-Secure Executor
-↓
-Tool Authorization
-↓
-MCP Tools
-├── system_info
-├── knowledge_base
-├── policy_lookup
-└── file_access
-↓
-FAISS Knowledge Base
-↓
-Output Guardrails
-↓
-Response
+Large Language Models (LLMs) are increasingly connected to external tools and enterprise data through the **Model Context Protocol (MCP)**. While this enables powerful AI agents, it also introduces several security risks such as:
 
-Audit logging operates across all security-sensitive operations.
+- Prompt Injection
+- Prompt Leakage
+- Personally Identifiable Information (PII) Exposure
+- Unauthorized Tool Execution
+- File Path Traversal
+- Information Leakage
+
+This project demonstrates a **layered security architecture** that mitigates these risks before and after LLM execution.
 
 ---
 
-## MCP Tools
+# Key Features
 
-### system_info
+## Input Security
 
-Returns platform and Python runtime information.
-
-### knowledge_base
-
-Performs retrieval from the FAISS knowledge base.
-
-### policy_lookup
-
-Retrieves information from security policy documents.
-
-### file_access
-
-Provides restricted file access to approved directories.
+- Input Normalization
+- Prompt Injection Detection
+- PII Detection & Redaction
+- Multi-layer Input Validation
 
 ---
 
-## Security Controls
+## Secure AI Agent
 
-### Prompt Injection Protection
-
-Blocked examples:
-
-* Ignore previous instructions
-* Reveal system prompt
-* Disable guardrails
-* Bypass restrictions
-
-### PII Protection
-
-Supported redactions:
-
-* Email Addresses
-* Phone Numbers
-* PAN Numbers
-* Aadhaar Numbers
-
-### File Access Protection
-
-Path traversal attacks are blocked.
-
-Example:
-
-../../../secret.txt
-
-Result:
-
-Access Denied
+- LangChain Integration
+- Ollama Integration
+- Llama 3.2 Model
+- Secure Agent Orchestration
+- Retrieval-Augmented Generation (RAG)
 
 ---
 
-## Knowledge Base
+## Retrieval-Augmented Generation (RAG)
 
-Current documents:
-
-* AI Safety Policy
-* MCP Security Policy
-* Data Protection Policy
-* Prompt Injection Guide
+- FAISS Vector Database
+- Sentence Transformers
+- Knowledge Base Search
+- Policy Retrieval
+- Grounded Responses
 
 ---
 
-## Installation
+## MCP Tool Security
 
-```bash
-git clone <repository-url>
+- FastMCP Integration
+- Tool Registration
+- Tool Authorization
+- Secure Tool Invocation
+- Restricted Tool Access
 
-cd secure-mcp-agent
+---
 
-python -m venv .venv
+## File Security
 
-source .venv/bin/activate
+- Directory Whitelisting
+- Path Traversal Protection
+- Unauthorized File Blocking
 
-pip install -r requirements.txt
+---
+
+## Output Security
+
+- PII Redaction
+- Prompt Leakage Prevention
+- Internal Path Redaction
+- Output Sanitization
+
+---
+
+## Audit Logging
+
+Security-sensitive events are logged including:
+
+- Prompt Injection Attempts
+- Unauthorized Tool Requests
+- Output Sanitization Events
+- File Access Violations
+
+---
+
+# System Architecture
+
+
+                           User
+                             │
+                             ▼
+                  Input Guardrails
+                             │
+      ┌────────────────────────────────┐
+      │ • Input Normalization          │
+      │ • Prompt Injection Detection   │
+      │ • PII Redaction                │
+      └────────────────────────────────┘
+                             │
+                             ▼
+                    Secure AI Agent
+               (LangChain + Ollama)
+                             │
+                             ▼
+                    Tool Authorization
+                             │
+        ┌──────────────┬───────────────┬──────────────┐
+        ▼              ▼               ▼              ▼
+ Knowledge Base   Policy Lookup   File Access   System Info
+        │
+        ▼
+     FAISS Vector Database
+        │
+        ▼
+      Llama 3.2 Response
+        │
+        ▼
+                 Output Guardrails
+        ┌────────────────────────────────┐
+        │ • PII Redaction                │
+        │ • Prompt Leakage Protection    │
+        │ • File Path Sanitization       │
+        └────────────────────────────────┘
+                             │
+                             ▼
+                       Final Response
 ```
 
 ---
 
-## Running
+# Project Structure
 
-Build the FAISS index:
+```text
+secure-mcp-agent/
+
+├── agent/
+├── docs/
+├── guardrails/
+├── knowledge_base/
+├── mcp_server/
+├── tools/
+
+├── tests/
+│   ├── integration/
+│   ├── security/
+│   └── unit/
+
+├── demo.py
+├── main.py
+├── requirements.txt
+├── README.md
+```
+
+---
+
+# Implemented Security Layers
+
+| Security Layer | Purpose |
+|---------------|---------|
+| Input Normalization | Standardizes user input before validation |
+| Prompt Injection Detection | Blocks malicious instruction override attempts |
+| PII Detection & Redaction | Removes sensitive user information |
+| Tool Authorization | Allows execution of approved MCP tools only |
+| Secure File Guardrails | Prevents directory traversal attacks |
+| Output Guardrails | Sanitizes AI responses before returning them |
+| Audit Logging | Records all security-sensitive operations |
+
+---
+
+# Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| knowledge_base | Searches the FAISS knowledge base |
+| policy_lookup | Retrieves security policy information |
+| file_access | Provides secure access to approved documents |
+| system_info | Returns system and runtime information |
+
+---
+
+# Knowledge Base
+
+The FAISS knowledge base currently contains:
+
+- AI Safety Policy
+- MCP Security Policy
+- Data Protection Policy
+- Prompt Injection Guide
+
+These documents are retrieved during RAG-based question answering.
+
+---
+
+# Security Demonstration
+
+The project includes a comprehensive demonstration showcasing:
+
+- Input Security Pipeline
+- Prompt Injection Prevention
+- PII Redaction
+- Retrieval-Augmented Generation
+- Secure File Access
+- Tool Authorization
+- Output Guardrails
+- Secure AI Agent
+
+Run the demonstration:
+
+```bash
+python demo.py
+```
+
+---
+
+# Security Test Suite
+
+The project contains organized automated test suites.
+
+## Security Tests
+
+- Input Normalization
+- Prompt Injection Detection
+- PII Detection
+- File Guardrails
+- Tool Authorization
+- Output Guardrails
+- Input Security Integration
+
+Run all security tests:
+
+```bash
+python tests/security/run_security_tests.py
+```
+
+---
+
+## Integration Tests
+
+Tests complete interaction between:
+
+- LangChain
+- Ollama
+- MCP Server
+- Secure Agent
+
+---
+
+## Unit Tests
+
+Individual validation of:
+
+- Policy Tools
+- Audit Logger
+- File Access
+- MCP Tools
+- Embeddings
+
+---
+
+# Installation
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+```
+
+Navigate to the project:
+
+```bash
+cd secure-mcp-agent
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate the environment.
+
+### macOS / Linux
+
+```bash
+source .venv/bin/activate
+```
+
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Build the FAISS knowledge base:
 
 ```bash
 python knowledge_base/build_index.py
 ```
 
-Run tests:
+---
+
+# Running the Project
+
+Start the interactive demonstration:
 
 ```bash
-python -m tests.test_agent
+python demo.py
+```
+
+Run the Secure AI Agent:
+
+```bash
+python main.py
+```
+
+Run the complete security validation suite:
+
+```bash
+python tests/security/run_security_tests.py
 ```
 
 ---
 
-## Test Results
+# Security Scope
 
-Total Tests Executed: 11
+This project demonstrates layered, rule-based security controls for AI agents. It is intended as a learning and engineering project and does **not** claim to provide absolute protection against every possible attack.
 
-Passed: 11
+Current protections include:
 
-Failed: 0
-
-Pass Rate: 100%
-
-See:
-
-docs/results.md
-
-for detailed validation results.
+- Prompt Injection Detection
+- PII Protection
+- Tool Authorization
+- File Access Restrictions
+- Prompt Leakage Prevention
+- Output Sanitization
 
 ---
 
-## Threat Model
+# Future Improvements
 
-See:
-
-docs/threat_model.md
-
-for the complete threat analysis.
-
----
-
-## Future Enhancements
-
-* Advanced prompt injection classification
-* Risk scoring engine
-* Role-based access control
-* Multi-document retrieval
-* Neo4j knowledge graph integration
-* Remote MCP deployment
+- Machine Learning-based Prompt Injection Detection
+- Risk Scoring Engine
+- Role-Based Access Control (RBAC)
+- Multi-Agent Security
+- Neo4j Knowledge Graph Integration
+- Remote MCP Deployment
+- JWT Authentication
+- Human Approval Workflow
 
 ---
 
-## Technology Stack
+# Technology Stack
 
-* Python 3.14
-* LangChain
-* FastMCP
-* Ollama
-* Llama 3.2
-* Sentence Transformers
-* FAISS
-* Pydantic
+- Python 3.14
+- LangChain
+- Ollama
+- Llama 3.2
+- FastMCP
+- FAISS
+- Sentence Transformers
+- Pydantic
 
 ---
 
-## Author
+# Author
 
-Developed as part of the Bharat Electronics Limited (BEL) AI/ML Internship Project.
+Developed as part of the **Bharat Electronics Limited (BEL)** AI/ML Internship Project.
+
+Focus Areas:
+
+- AI Security
+- Model Context Protocol (MCP)
+- Retrieval-Augmented Generation (RAG)
+- Secure AI Agents
+- Guardrails for LLM Applications

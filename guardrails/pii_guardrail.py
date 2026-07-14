@@ -1,46 +1,121 @@
 """
 PII Detection and Redaction
+
+Detects and redacts Personally Identifiable Information (PII)
+from already-normalized input.
+
+Supported PII:
+- Email Address
+- Phone Number
+- PAN Number
+- Aadhaar Number
 """
 
 import re
 
+from guardrails.audit_logger import log_event
 
-EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
+# ----------------------------------------------------
+# Regex Patterns
+# ----------------------------------------------------
 
-PHONE_PATTERN = r"\b\d{10}\b"
+PII_PATTERNS = {
+    "EMAIL": (
+        re.compile(
+            r"\b[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}\b",
+            re.IGNORECASE,
+        ),
+        "[EMAIL_REDACTED]",
+    ),
 
-PAN_PATTERN = r"\b[A-Z]{5}[0-9]{4}[A-Z]\b"
+    "AADHAAR": (
+        re.compile(
+            r"\b\d{4}[- ]?\d{4}[- ]?\d{4}\b"
+        ),
+        "[AADHAAR_REDACTED]",
+    ),
 
-AADHAAR_PATTERN = r"\b\d{4}\s?\d{4}\s?\d{4}\b"
+    "PHONE": (
+        re.compile(
+            r"(?:\+91[\s\-]?)?(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{10})"
+        ),
+        "[PHONE_REDACTED]",
+    ),
 
+    "PAN": (
+        re.compile(
+            r"\b[a-zA-Z]{5}[- ]?\d{4}[- ]?[a-zA-Z]\b",
+            re.IGNORECASE,
+        ),
+        "[PAN_REDACTED]",
+    ),
+}
+
+
+# ----------------------------------------------------
+# Detection
+# ----------------------------------------------------
+
+def detect_pii(text: str) -> dict:
+    """
+    Detect supported PII entities.
+
+    Returns:
+        {
+            "EMAIL": [...],
+            "PHONE": [...],
+            "PAN": [...],
+            "AADHAAR": [...]
+        }
+    """
+
+    detected = {}
+
+    for name, (pattern, _) in PII_PATTERNS.items():
+
+        matches = pattern.findall(text)
+
+        if matches:
+            detected[name] = matches
+
+    return detected
+
+
+# ----------------------------------------------------
+# Redaction
+# ----------------------------------------------------
 
 def redact_pii(text: str) -> str:
     """
-    Redact common PII patterns.
+    Detect and redact supported PII.
+
+    Logs only the number of detected entities,
+    never the actual sensitive values.
     """
 
-    text = re.sub(
-        EMAIL_PATTERN,
-        "[EMAIL_REDACTED]",
-        text,
-    )
+    sanitized = text
 
-    text = re.sub(
-        PHONE_PATTERN,
-        "[PHONE_REDACTED]",
-        text,
-    )
+    detected = detect_pii(text)
 
-    text = re.sub(
-        PAN_PATTERN,
-        "[PAN_REDACTED]",
-        text,
-    )
+    for _, (pattern, replacement) in PII_PATTERNS.items():
 
-    text = re.sub(
-        AADHAAR_PATTERN,
-        "[AADHAAR_REDACTED]",
-        text,
-    )
+        sanitized = pattern.sub(
+            replacement,
+            sanitized,
+        )
 
-    return text
+    if detected:
+
+        summary = " ".join(
+            f"{name}:{len(values)}"
+            for name, values in detected.items()
+        )
+
+        log_event(
+            event_type="PII_REDACTED",
+            details=summary,
+            guardrail="PII_GUARDRAIL",
+            severity="INFO",
+        )
+
+    return sanitized

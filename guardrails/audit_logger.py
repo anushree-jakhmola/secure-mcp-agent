@@ -1,7 +1,8 @@
 """
 Audit Logger
 
-Tracks security-relevant events.
+Records security-relevant events generated
+by the Secure MCP Agent.
 """
 
 from datetime import datetime
@@ -10,9 +11,11 @@ from datetime import datetime
 def log_event(
     event_type: str,
     details: str,
+    guardrail: str = "UNKNOWN",
+    severity: str = "INFO",
 ) -> None:
     """
-    Append security events to audit.log
+    Append a structured security event to audit.log.
     """
 
     timestamp = datetime.now().strftime(
@@ -21,6 +24,8 @@ def log_event(
 
     log_entry = (
         f"[{timestamp}] "
+        f"[{severity}] "
+        f"[{guardrail}] "
         f"{event_type}: "
         f"{details}\n"
     )
